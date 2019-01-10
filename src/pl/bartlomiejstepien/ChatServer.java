@@ -1,6 +1,7 @@
 package pl.bartlomiejstepien;
 
 import pl.bartlomiejstepien.entities.UserConnection;
+import pl.bartlomiejstepien.listeners.Listener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +20,7 @@ public class ChatServer implements Runnable
 
     private final ServerSocket serverSocket;
     private final List<UserConnection> connectedUsers = new ArrayList<>();
+    private final List<Listener> eventListeners = new ArrayList<>();
 
 //    private final PrintWriter serverWriteStream;
 //    private final BufferedReader serverReadStream;
@@ -47,6 +49,12 @@ public class ChatServer implements Runnable
 
             userConnection.sendMessageToUser(message);
         }
+    }
+
+    public void registerEventListener(Listener listener)
+    {
+        if(!this.eventListeners.contains(listener))
+            this.eventListeners.add(listener);
     }
 
     @Override

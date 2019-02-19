@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'idea'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+//mainClassName = 'pl.bartlomiejstepien.Main'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'pl.bartlomiejstepien.Main'
+    }
+}

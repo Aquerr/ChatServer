@@ -1,10 +1,12 @@
 package pl.bartlomiejstepien.entities;
 
 import pl.bartlomiejstepien.ChatServer;
+import pl.bartlomiejstepien.events.MessageReceiveEvent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 
 public class UserConnection
 {
@@ -32,11 +34,18 @@ public class UserConnection
 
     private void startListening()
     {
-        String message;
+        String rawMessage;
         try
         {
-            while (((message = this.streamReader.readLine()) != null))
+            while (((rawMessage = this.streamReader.readLine()) != null))
             {
+                if(rawMessage.startsWith("/"))
+                {
+                    //Run server command
+
+                }
+                Message message = new Message(this.userName, rawMessage, LocalDateTime.now());
+                this.chatServer.getEventManager().runEvent(new MessageReceiveEvent(this, message));
                 this.chatServer.sendMessage(this.userName, message);
             }
         }
@@ -46,7 +55,7 @@ public class UserConnection
         }
     }
 
-    public void sendMessageToUser(String message)
+    public void sendMessage(Message message)
     {
         this.streamWriter.println(message);
         this.streamWriter.flush();

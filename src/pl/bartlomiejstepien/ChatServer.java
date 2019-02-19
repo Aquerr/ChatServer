@@ -1,5 +1,6 @@
 package pl.bartlomiejstepien;
 
+import pl.bartlomiejstepien.entities.Message;
 import pl.bartlomiejstepien.entities.UserConnection;
 import pl.bartlomiejstepien.listeners.Listener;
 
@@ -16,11 +17,11 @@ import java.util.List;
 
 public class ChatServer implements Runnable
 {
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     private final ServerSocket serverSocket;
     private final List<UserConnection> connectedUsers = new ArrayList<>();
-    private final List<Listener> eventListeners = new ArrayList<>();
+    private final EventManager eventManager = EventManager.getInstance();
 
 //    private final PrintWriter serverWriteStream;
 //    private final BufferedReader serverReadStream;
@@ -31,30 +32,27 @@ public class ChatServer implements Runnable
 //        this.serverWriteStream = new PrintWriter(this.serverSocket);
     }
 
-    public void sendMessage(String fromNickname, String message)
+    public EventManager getEventManager()
+    {
+        return this.eventManager;
+    }
+
+    public void sendMessage(String fromNickname, Message message)
     {
         for (UserConnection userConnection : connectedUsers)
         {
-            if (userConnection.getUsername().equals(fromNickname))
-                continue;
+//            if (userConnection.getUsername().equals(fromNickname))
+//                continue;
 
-            StringBuilder messageBuilder = new StringBuilder();
-            messageBuilder.append("[");
-            messageBuilder.append(dateTimeFormatter.format(LocalTime.now()));
-            messageBuilder.append("]");
-            messageBuilder.append("[");
-            messageBuilder.append(fromNickname);
-            messageBuilder.append("]: ");
-            messageBuilder.append(message);
-
-            userConnection.sendMessageToUser(message);
+            userConnection.sendMessage(message);
         }
+
+//        System.out.println(message);
     }
 
     public void registerEventListener(Listener listener)
     {
-        if(!this.eventListeners.contains(listener))
-            this.eventListeners.add(listener);
+        this.eventManager.registerEventListener(listener);
     }
 
     @Override
@@ -86,6 +84,7 @@ public class ChatServer implements Runnable
     private String loginUser(BufferedReader clientStreamReader, PrintWriter clientStreamWriter) throws IOException
     {
         clientStreamWriter.println("Enter your username: ");
+        clientStreamWriter.flush();
         String username;
         username = clientStreamReader.readLine();
         if (username.equals("") || username.equals(" "))
@@ -100,6 +99,11 @@ public class ChatServer implements Runnable
             clientStreamWriter.flush();
             return loginUser(clientStreamReader, clientStreamWriter);
         }
-        return username;
+        else
+        {
+            clientStreamWriter.println("Correctly logged in as " + username + "!");
+            clientStreamWriter.flush();
+            return username;
+        }
     }
 }

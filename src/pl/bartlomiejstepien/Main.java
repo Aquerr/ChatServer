@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         try
         {
-            ChatServer chatServer = new ChatServer(4444);
+            ChatServer chatServer = new ChatServer(25568);
             chatServer.registerEventListener(new MessageReceiveListener());
             chatServer.run();
         }

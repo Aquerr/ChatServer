@@ -42,7 +42,6 @@ public class UserConnection
                 if(rawMessage.startsWith("/"))
                 {
                     //Run server command
-
                 }
                 Message message = new Message(this.userName, rawMessage, LocalDateTime.now());
                 this.chatServer.getEventManager().runEvent(new MessageReceiveEvent(this, message));

@@ -162,6 +162,7 @@ public class ClientApplication extends Application implements Runnable
                         label.setTextFill(Color.WHITESMOKE);
                         messages.add(label);
                         chatBox.getChildren().add(messageIndex, messages.get(messageIndex));
+                        scrollPaneChat.setVvalue(scrollPaneChat.getVmax());
                         messageIndex++;
                     }
                 });

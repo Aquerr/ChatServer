@@ -5,11 +5,12 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -23,6 +24,7 @@ public class ClientApplication extends Application implements Runnable
 //    private ObservableList<String> chatList = FXCollections.observableArrayList();
     private List<Label> messages = new ArrayList<>();
     private VBox chatBox = null;
+    private ScrollPane scrollPaneChat = null;
     private int messageIndex = 0;
     private PrintWriter serverPrintWriter = null;
     private TextField inputField = null;
@@ -44,11 +46,13 @@ public class ClientApplication extends Application implements Runnable
         gridPane.setMinWidth(300);
         gridPane.setMinHeight(300);
         gridPane.setGridLinesVisible(true);
+        gridPane.setBackground(new Background(new BackgroundFill(Color.web("#2F3136"), null, null)));
         Scene scene = new Scene(gridPane, 300, 300);
 
         connectButton = new Button("Połącz");
         connectButton.setMinWidth(100);
         connectButton.setOnAction(connect());
+        connectButton.setBackground(new Background(new BackgroundFill(Color.web("#D2D3D3"), null, null)));
 //        Text text = new Text();
 //        text.setWrappingWidth(10);
 //        ListView<String> chatList = new ListView<>();
@@ -56,14 +60,24 @@ public class ClientApplication extends Application implements Runnable
 //        chatList.setMinWidth(150);
 //        chatList.setMinHeight(300);
         chatBox = new VBox();
-        chatBox.setMinWidth(400);
+        chatBox.setMinWidth(370);
         chatBox.setMinHeight(400);
+        chatBox.setBackground(new Background(new BackgroundFill(Color.web("#36393F"), null, null)));
         inputField = new TextField();
         inputField.setPromptText("Enter message here...");
         inputField.setOnAction(onTextEnter());
+        inputField.setBackground(new Background(new BackgroundFill(Color.web("#36393F"), null, null)));
+        inputField.setStyle("-fx-text-fill: #ffffff");
+        scrollPaneChat = new ScrollPane();
+        scrollPaneChat.setPrefSize(400, 400);
+        scrollPaneChat.setContent(chatBox);
+        scrollPaneChat.setFitToWidth(true);
+//        scrollPaneChat.setVisible(true);
+//        scrollPaneChat.setFitToHeight(true);
+//        scrollPaneChat.setFitToWidth(true);
 
-
-        gridPane.add(chatBox, 1, 0);
+//        gridPane.add(chatBox, 1, 0);
+        gridPane.add(scrollPaneChat, 1, 0);
         gridPane.add(connectButton, 0, 1);
         gridPane.add(inputField, 1, 1);
 
@@ -114,7 +128,7 @@ public class ClientApplication extends Application implements Runnable
     {
         try
         {
-            Socket socket = new Socket("bartlomiejstepien.pl", 25568);
+            Socket socket = new Socket("localhost", 25568);
 
             serverPrintWriter = new PrintWriter(socket.getOutputStream());
             BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -145,6 +159,7 @@ public class ClientApplication extends Application implements Runnable
                     {
                         Label label = new Label(finalLine);
                         label.setWrapText(true);
+                        label.setTextFill(Color.WHITESMOKE);
                         messages.add(label);
                         chatBox.getChildren().add(messageIndex, messages.get(messageIndex));
                         messageIndex++;

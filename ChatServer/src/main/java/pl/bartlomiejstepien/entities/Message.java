@@ -45,6 +45,11 @@ public class Message
         return this.rawMessage;
     }
 
+    public LocalDateTime getDateTime()
+    {
+        return dateTime;
+    }
+
     @Override
     public String toString()
     {

@@ -72,6 +72,9 @@ public class ClientApplication extends Application implements Runnable
         scrollPaneChat.setPrefSize(400, 400);
         scrollPaneChat.setContent(chatBox);
         scrollPaneChat.setFitToWidth(true);
+        scrollPaneChat.setStyle("-fx-background-color: black;\n" +
+                "-fx-background-radius: 5em");
+        scrollPaneChat.setStyle("-fx-background-color: black");
 //        scrollPaneChat.setVisible(true);
 //        scrollPaneChat.setFitToHeight(true);
 //        scrollPaneChat.setFitToWidth(true);
@@ -128,7 +131,7 @@ public class ClientApplication extends Application implements Runnable
     {
         try
         {
-            Socket socket = new Socket("localhost", 25568);
+            Socket socket = new Socket("bartlomiejstepien.pl", 25568);
 
             serverPrintWriter = new PrintWriter(socket.getOutputStream());
             BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));

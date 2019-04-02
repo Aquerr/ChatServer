@@ -1,5 +1,6 @@
 package pl.bartlomiejstepien;
 
+import pl.bartlomiejstepien.controllers.RoutesController;
 import pl.bartlomiejstepien.entities.Message;
 import pl.bartlomiejstepien.entities.UserConnection;
 import pl.bartlomiejstepien.listeners.Listener;
@@ -14,6 +15,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class ChatServer implements Runnable
 {
@@ -22,6 +24,8 @@ public class ChatServer implements Runnable
     private final ServerSocket serverSocket;
     private final List<UserConnection> connectedUsers = new ArrayList<>();
     private final EventManager eventManager = EventManager.getInstance();
+
+    private RoutesController routesController = RoutesController.getInstance();
 
 //    private final PrintWriter serverWriteStream;
 //    private final BufferedReader serverReadStream;
@@ -63,16 +67,18 @@ public class ChatServer implements Runnable
         {
             try
             {
-                Socket client = this.serverSocket.accept();
+                final Socket client = this.serverSocket.accept();
+
+//                final BufferedReader clientStreamReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+//                final PrintWriter clientStreamWriter = new PrintWriter(client.getOutputStream());
+
+                CompletableFuture.runAsync(() -> routesController.handleRequestSocket(client));
 
                 //Ask for login
-                BufferedReader clientStreamReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                PrintWriter clientStreamWriter = new PrintWriter(client.getOutputStream());
+//                String username = loginUser(clientStreamReader, clientStreamWriter);
 
-                String username = loginUser(clientStreamReader, clientStreamWriter);
-
-                UserConnection userConnection = new UserConnection(this, username, clientStreamWriter, clientStreamReader);
-                this.connectedUsers.add(userConnection);
+//                UserConnection userConnection = new UserConnection(this, username, clientStreamWriter, clientStreamReader);
+//                this.connectedUsers.add(userConnection);
             }
             catch (IOException e)
             {

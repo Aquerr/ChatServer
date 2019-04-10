@@ -13,6 +13,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -131,7 +133,7 @@ public class ClientApplication extends Application implements Runnable
     {
         try
         {
-            Socket socket = new Socket("bartlomiejstepien.pl", 25568);
+            Socket socket = new Socket("localhost", 25568);
 
             serverPrintWriter = new PrintWriter(socket.getOutputStream());
             BufferedReader inputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -155,20 +157,36 @@ public class ClientApplication extends Application implements Runnable
             while((line = inputStream.readLine()) != null)
             {
                 String finalLine = line;
-                Platform.runLater(new Runnable()
+                JSONObject jsonObject = null;
+
+                try
                 {
-                    @Override
-                    public void run()
+                    jsonObject = new JSONObject(finalLine);
+                }
+                catch(JSONException e)
+                {
+                    System.out.println("Not a JSON!");
+                }
+
+                if(jsonObject != null)
+                {
+                    JSONObject messageJson = jsonObject;
+                    Platform.runLater(new Runnable()
                     {
-                        Label label = new Label(finalLine);
-                        label.setWrapText(true);
-                        label.setTextFill(Color.WHITESMOKE);
-                        messages.add(label);
-                        chatBox.getChildren().add(messageIndex, messages.get(messageIndex));
-                        scrollPaneChat.setVvalue(scrollPaneChat.getVmax());
-                        messageIndex++;
-                    }
-                });
+                        @Override
+                        public void run()
+                        {
+                            String formattedMessage = messageJson.getString("user") + ": " + messageJson.getString("message");
+                            Label label = new Label(formattedMessage);
+                            label.setWrapText(true);
+                            label.setTextFill(Color.WHITESMOKE);
+                            messages.add(label);
+                            chatBox.getChildren().add(messageIndex, messages.get(messageIndex));
+                            scrollPaneChat.setVvalue(scrollPaneChat.getVmax());
+                            messageIndex++;
+                        }
+                    });
+                }
             }
 
             //Getting from server

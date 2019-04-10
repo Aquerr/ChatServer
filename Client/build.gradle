@@ -13,6 +13,10 @@ targetCompatibility = 1.8
 
 mainClassName = 'io.github.aquerr.Main'
 
+dependencies {
+    compile group: 'org.json', name: 'json', version: '20180813'
+}
+
 //sourceSets {
 //    main {
 //        java {

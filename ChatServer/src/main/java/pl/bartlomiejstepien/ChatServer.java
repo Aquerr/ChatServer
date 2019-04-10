@@ -23,9 +23,10 @@ public class ChatServer implements Runnable
 
     private final ServerSocket serverSocket;
     private final List<UserConnection> connectedUsers = new ArrayList<>();
+    private final List<Socket> sockets = new ArrayList<>();
     private final EventManager eventManager = EventManager.getInstance();
 
-    private RoutesController routesController = RoutesController.getInstance();
+    private RoutesController routesController = RoutesController.getInstance(this);
 
 //    private final PrintWriter serverWriteStream;
 //    private final BufferedReader serverReadStream;
@@ -69,6 +70,8 @@ public class ChatServer implements Runnable
             {
                 final Socket client = this.serverSocket.accept();
 
+                sockets.add(client);
+
 //                final BufferedReader clientStreamReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 //                final PrintWriter clientStreamWriter = new PrintWriter(client.getOutputStream());
 
@@ -111,5 +114,10 @@ public class ChatServer implements Runnable
             clientStreamWriter.flush();
             return username;
         }
+    }
+
+    public Iterable<? extends Socket> getClients()
+    {
+        return this.sockets;
     }
 }

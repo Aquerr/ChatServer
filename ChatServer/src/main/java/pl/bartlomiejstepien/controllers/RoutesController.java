@@ -1,5 +1,6 @@
 package pl.bartlomiejstepien.controllers;
 
+import pl.bartlomiejstepien.ChatServer;
 import pl.bartlomiejstepien.routes.Result;
 import pl.bartlomiejstepien.routes.Route;
 import pl.bartlomiejstepien.routes.Routes;
@@ -11,7 +12,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.net.Socket;
 import java.util.*;
 
@@ -20,9 +20,19 @@ import java.util.*;
  */
 public final class RoutesController
 {
-    private static RoutesController INSTANCE = new RoutesController();
+    private static RoutesController INSTANCE;
+    private ChatServer chatServer;
 
-    public static RoutesController getInstance() {
+    public RoutesController(ChatServer chatServer)
+    {
+        this.chatServer = chatServer;
+    }
+
+    public static RoutesController getInstance(ChatServer chatServer) {
+        if(INSTANCE == null)
+        {
+            INSTANCE = new RoutesController(chatServer);
+        }
         return INSTANCE;
     }
 
@@ -49,6 +59,16 @@ public final class RoutesController
 
             //Search for method in controllers
             final Result result = runRoute(httpMethodType, url);
+
+            if(url.contains("sendMessage"))
+            {
+                for(Socket socket : chatServer.getClients())
+                {
+                    PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+                    printWriter.println(result.getResponseBody());
+                    printWriter.flush();
+                }
+            }
 
             //Send Response
             final PrintWriter clientStreamWriter = new PrintWriter(client.getOutputStream());
